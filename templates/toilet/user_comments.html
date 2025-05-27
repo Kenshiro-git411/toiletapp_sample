@@ -1,0 +1,51 @@
+{% extends 'toilet/base.html' %}
+{% load mytag %}
+{% load static %}
+{% block title %} マイページ {% endblock %}
+
+{% block content %}
+    <h1 class="w-full max-w-3xl text-2xl font-bold mx-auto text-center mt-5 sm:mt-10 p-2 border-b border-gray-200">マイページ</h1>
+    <div>
+        {% for comment in page_obj %}
+        <div class="flex flex-col items-start justify-center p-3 my-4 rounded bg-[#D2E8F8]">
+            <div class="flex items-center">
+                {% if comment.gender.pk != 3 %}
+                    <span>{{ comment.gender }}：</span>
+                {% else %}
+                    <span>多機能：</span>
+                {% endif %}
+                <span class="border-b border-gray-400">{{ comment.toilet }}</span>
+                <span class="text-sm text-gray-800 inline-block ml-1">{{ comment.data_create | time_since}}前</span>
+            </div>
+            <div class="w-full flex justify-between items-center">
+                <ul class="flex items-center space-x-4 pt-1">
+                    <li>きれいさ★{{ comment.value }}</li>
+                    <li>広さ★{{ comment.size }}</li>
+                    <li>空き具合★{{ comment.congestion }}</li>
+                </ul>
+                <div class="flex items-center space-x-4 sm:space-x-7">
+                    <a href="{% url 'toilet:toilet_review_revise' comment.pk comment.gender.pk %}"><img src="{% static '/accounts/account_revise.png' %}" alt="ロゴ_修正" class="w-4 h-auto"></a>
+                    <a href="{% url 'toilet:toilet_review_delete' comment.pk comment.gender.pk %}" onclick="return confirm('レビューを削除してもよろしいですか？')"><img src="{% static '/accounts/account_trush.png' %}" alt="ロゴ_ゴミ箱" class="w-5 h-auto"></a>
+                </div>
+            </div>
+            <p class="w-full text-justify  rounded p-4 mt-1 bg-white">{{ comment.comment }}</p>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="my-10 flex justify-center items-center">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}" class="px-3 py-1 bg-[#86C3EE] rounded">前へ</a>
+        {% endif %}
+
+        <span class="mx-4">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span>
+
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}" class="px-3 py-1 bg-[#86C3EE] rounded">次へ</a>
+        {% endif %}
+    </div>
+
+<script>
+
+
+</script>
+{% endblock %}

@@ -1,0 +1,86 @@
+{% extends 'toilet/base.html' %}
+{% load mytag %}
+{% load static %}
+{% block title %} 最新のレビュー {% endblock %}
+
+{% block content %}
+    <h2 class="flex items-center justify-center my-5 sm:my-10">
+        <span class="font-bold text-2xl text-[#40A0E3]">最新レビュー</span>
+        <img src="{% static '/toilet/review.png' %}" alt="ロゴ_レビュー" class="w-8 ml-1 h-auto">
+    </h2>
+    <section class="w-full max-w-xl flex flex-col justify-center items-center py-2 mx-auto">
+        <div class="w-full flex items-center py-2 border-b border-gray-300 text-lg font-bold">男性トイレ</div>
+        <div class="w-full h-96 overflow-auto bg-white border border-gray-300 p-3 rounded-md my-2">
+            {% if male_comments %}
+            {% for comment in male_comments %}
+            <div class="w-full flex flex-col justify-center p-2 border-b border-gray-300">
+                <div class="flex-col w-full">
+                    <span class="">@{{ comment.user.username }}</span>
+                    <span>{{ comment.data_create | time_since }}前</span>
+                </div>
+                <span class="px-2">{{ comment.toilet }}</span>
+                <div class="pl-2 space-x-2">
+                    <span>きれいさ★{{ comment.value }}</span>
+                    <span>広さ★{{ comment.size }}</span>
+                    <span>空き具合★{{ comment.congestion }}</span>
+                </div>
+                <p class="px-2 text-justify">{{ comment.comment }}</p>
+            </div>
+            {% endfor %}
+            {% else %}
+            <div class="w-full flex items-center px-1">男性トイレのレビューはありません</div>
+            {% endif %}
+        </div>
+    </section>
+    
+    <section class="w-full max-w-xl flex flex-col justify-center items-center py-2 mx-auto">
+        <div class="w-full flex items-center py-2 border-b border-gray-300 text-lg font-bold">女性トイレ</div>
+        <div class="w-full h-96 overflow-auto bg-white border border-gray-300 p-3 rounded-md my-2">
+            {% if female_comments %}
+                {% for comment in female_comments %}
+                <div class="w-full flex flex-col justify-center p-2 border-b border-gray-300">
+                    <div class="flex-col">
+                        <span>@{{ comment.user.username }}</span>
+                        <span class="text-sm">{{ comment.data_create | time_since }}前</span>
+                    </div>
+                    <span class="px-2">{{ comment.toilet }}</span>
+                    <div class="pl-2 space-x-2">
+                        <span>きれいさ★{{ comment.value }}</span>
+                        <span>広さ★{{ comment.size }}</span>
+                        <span>空き具合★{{ comment.congestion }}</span>
+                    </div>
+                    <p class="px-2 text-justify">{{ comment.comment }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="w-full flex items-center px-1">女性トイレのレビューはありません</div>
+            {% endif %}
+        </div>
+    </section>
+
+    <section class="w-full max-w-xl flex flex-col justify-center items-center py-2 mx-auto mb-10">
+        <div class="w-full flex items-center py-2 border-b border-gray-300 text-lg font-bold">多機能トイレ</div>
+        <div class="w-full h-96 overflow-auto bg-white border border-gray-300 p-3 rounded-md my-2">
+            {% if multi_comments %}
+                {% for comment in multi_comments %}
+                <div class="w-full flex flex-col justify-center p-2 border-b border-gray-300">
+                    <div class="flex-col">
+                        <span>@{{ comment.user.username }}</span>
+                        <span class="text-sm">{{ comment.data_create | time_since }}前</span>
+                    </div>
+                    <span class="px-2">{{ comment.toilet }}</span>
+                    <div class="pl-2 space-x-2">
+                        <span>きれいさ★{{ comment.value }}</span>
+                        <span>広さ★{{ comment.size }}</span>
+                        <span>空き具合★{{ comment.congestion }}</span>
+                    </div>
+                    <p class="px-2 text-justify">{{ comment.comment }}</p>
+                </div>
+                {% endfor %}
+            {% else %}
+            <div class="w-full flex items-center px-1 py-2">多機能トイレのレビューはありません</div>
+            {% endif %}
+        </div>
+    </section>
+
+{% endblock %}

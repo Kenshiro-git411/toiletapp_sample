@@ -1,0 +1,13 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %} ユーザー情報更新完了 {% endblock %}
+
+{% block content %}
+    <div class="flex flex-col items-center justify-center my-5 sm:my-10 w-full space-y-8">
+        <p class="text-lg font-bold">ユーザー情報を更新しました</p>
+        <div class="flex flex-col items-center justify-center space-y-6 w-full">
+            <a href="{% url 'accounts:user_info_update' %}" class="sm:w-1/2 w-full bg-blue-500 text-white py-2 px-4 hover:bg-blue-600 transition text-center rounded rounded-full">ユーザー情報更新へ</a>
+            <a href="{% url 'toilet:home' %}" class="sm:w-1/2 w-full bg-blue-500 text-white py-2 px-4 hover:bg-blue-600 transition text-center rounded rounded-full">ホームへ</a>
+        </div>
+    </div>
+{% endblock %}

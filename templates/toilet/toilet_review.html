@@ -1,0 +1,35 @@
+{% extends 'toilet/base.html' %}
+
+{% block title %} トイレのレビュー {% endblock %}
+
+{% block content %}
+<div>
+    <form method="post" action="{% url 'toilet:toilet_review' toilet.toilet_id.pk toilet.gender.pk %}">{% csrf_token %}
+        <ul class="flex items-center space-x-4">
+            <li class="w-1/3 sm:w-1/6">
+                {{ review_form.value.label }}
+                {{ review_form.value }}
+            </li>
+            <li class="w-1/3 sm:w-1/6">
+                {{ review_form.size.label }}
+                {{ review_form.size }}
+            </li>
+            <li class="w-1/3 sm:w-1/6">
+                {{ review_form.congestion.label }}
+                {{ review_form.congestion }}
+            </li>
+        </ul>
+        <div class="flex flex-col my-3">
+            <label>トイレ場所</label>
+            <p class="flex pl-1 pr-3 py-1 bg-white w-fit border border-gray-500">{{ toilet.toilet_id.place }}</p>
+        </div>
+        <div>
+            {{ review_form.comment.label }}
+            {{ review_form.comment }}
+        </div>
+        <button type="submit" class="w-full sm:w-3/5 block mx-auto text-center bg-[#62AEE4] hover:bg-[#40A0E3] border-transparent mt-10 py-2 shadow-lg text-white font-bold hover:shadow-none hover:duration-400">レビュー</button>
+    </form>
+
+    <a href="{% url 'toilet:toilet_info' toilet.pk toilet.gender.pk  %}" class="inline-block my-8 border-b border-gray-500">トイレ詳細ページに戻る</a>
+</div>
+{% endblock %}

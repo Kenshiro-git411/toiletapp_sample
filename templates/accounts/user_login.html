@@ -1,0 +1,36 @@
+{% extends 'accounts/base.html' %}
+{% load static %}
+
+{% block title %} ログイン画面 {% endblock %}
+
+{% block content %}
+    <div class="items-center justify-center">
+        <!-- タイトルを中央ぞろえ -->
+        <h1 class="text-2xl font-bold w-3/5 mx-auto text-center my-5 sm:my-10">ログイン</h1>
+        <div class="flex flex-col items-center justify-center rounded-lg py-2">
+            <form method="post" action="" class="w-full sm:w-3/5 ">{% csrf_token %}
+                <div class="mt-7">
+                    <label class="font-bold">{{ login_form.email.label }}</label>
+                    <div>{{ login_form.email }}</div>
+                </div>
+                <div class="mt-5">
+                    <label class="font-bold">{{ login_form.password.label }}</label>
+                    <div>{{ login_form.password }}</div>
+                </div>
+                {% if messages %}
+                    {% for message in messages %}
+                        {% if "warning" in message.tags %}
+                            <p class="font-semibold text-red-500">{{ message }}</p>
+                        {% endif %}
+                    {% endfor %}
+                {% endif %}
+                <button type="submit" class="w-3/5 flex items-center justify-center w-full bg-[#62AEE4] hover:bg-[#40A0E3] border-transparent mt-10 py-2 shadow-lg text-white font-bold hover:shadow-none hover:duration-400">ログイン</button>
+            </form>
+            <a id="line_login" href="{% url 'toilet:liff_entry' %}?redirect=home" class="flex items-center justify-center mt-10 w-full sm:w-3/5 mx-auto text-center bg-[#06C755] p-2"><img src="{% static '/accounts/account_line_login.png' %}" alt="LINEログイン" class="h-6"><span class="px-4 text-white font-bold">LINEでログイン</span></a>
+            <div class="flex items-center justify-center my-10 pb-10 w-full sm:w-3/5 border-b border-gray-400">
+                <a href="{% url 'accounts:password_reset_request' %}" class=" mx-auto text-center border-b border-gray-400">パスワードお忘れの方はこちら</a>
+            </div>
+            <a href="{% url 'accounts:user_create' %}" class="mx-auto text-center text-[#40A0E3] font-bold bg-white my-5 py-2 w-full sm:w-3/5 outline outline-3 outline-bg-[#40A0E3] shadow-lg hover:shadow-none hover:duration-700">ユーザー登録</a>
+        </div>
+    </div>
+{% endblock %}

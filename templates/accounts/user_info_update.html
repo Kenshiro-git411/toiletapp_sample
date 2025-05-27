@@ -1,0 +1,50 @@
+{% extends 'accounts/base.html' %}
+
+{% block title %} ユーザー情報更新画面 {% endblock %}
+{% block content %}
+<div class="flex flex-col items-center justify-center">
+    <h1 class="w-full max-w-md text-2xl font-bold mx-auto text-center mt-5 sm:mt-10 p-2 border-b border-gray-300">ユーザー情報更新</h1>
+    <div class="w-full max-w-md flex flex-col items-center justify-center py-2">
+        <form method="post" action="{% url 'accounts:user_info_update' %}" class="w-full">{% csrf_token %}
+            <div class="mt-7">
+                <label>{{ update_form.email.label }}</label>
+                <div>{{ update_form.email }}</div>
+                {% for error in update_form.email.errors %}
+                    <p class="font-semibold text-red-500">{{ error }}</p>
+                {% endfor %}
+            </div>
+            <div class="mt-5">
+                <label>{{ update_form.username.label }}</label>
+                <div>{{ update_form.username }}</div>
+                {% for error in update_form.username.errors %}
+                    <p class="font-semibold text-red-500">{{ error }}</p>
+                {% endfor %}
+            </div>
+            <div class="mt-5">
+                <label>{{ update_form.gender.label }}</label>
+                <div>{{ update_form.gender }}</div>
+            </div>
+            <div class="mt-5">
+                <label>{{ update_form.is_barrier_free.label }}</label>
+                <div>{{ update_form.is_barrier_free }}</div>
+            </div>
+            <!-- 全体のエラーメッセージを表示 -->
+            {% if signin_form.non_field_errors %}
+                <div class="text-red-500">
+                    <ul>
+                        {% for error in signin_form.non_field_errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+            <button type="submit" class="w-full flex items-center justify-center w-full bg-[#62AEE4] hover:bg-[#40A0E3] border-transparent mt-10 py-2 shadow-lg text-white font-bold hover:shadow-none hover:duration-400">更新する</button>
+        </form>
+        
+        <div class="flex flex-col w-full max-w-md space-y-4 mt-10">
+            <a href="{% url 'accounts:password_reset_request' %}" class="block text-left text-blue-700">パスワード変更はこちら</a>
+            <a href="{% url 'accounts:user_delete' %}" class="block text-left text-blue-700">アカウント削除はこちら</a>
+        </div>
+    </div>
+</div>
+{% endblock %}

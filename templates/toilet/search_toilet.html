@@ -1,0 +1,115 @@
+{% extends 'toilet/base.html' %}
+{% load static %}
+
+{% block title %} トイレを探す {% endblock %}
+
+{% block content %}
+    <h2 class="flex items-center justify-center w-full my-5 sm:my-10">
+        <span class="font-bold text-2xl text-[#40A0E3]">トイレを探す</span>
+        <img src="{% static '/toilet/search.png' %}" alt="ロゴ_虫眼鏡" class="w-6 ml-1 h-auto">
+    </h2>
+    <div class="w-full  flex items-center justify-center p-8 block mx-auto text-center bg-[#EAF3F8]">
+        <form method="post" action="{% url 'toilet:search_toilet' %}" class="w-full sm:w-2/4">{% csrf_token %}
+            <div class="relative">
+                <label class="text-lg block mb-2 text-left">{{ search_form.station_name.label }}</label>
+                <div>{{ search_form.station_name }}</div>
+                <input type="hidden" id="station_id" name="station_id">
+            </div>
+            <button type="submit" class="block w-full bg-[#62AEE4] text-white py-2 mt-4 shadow-md hover:shadow-none hover:bg-[#40A0E3] transition ">探す</button>
+        </form>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            
+            const stationInput = document.getElementById("station_input");
+            const stationId = document.getElementById("station_id");
+            // searchStation関数をkeyupで呼び出す（keyupはinputフィールドに文字を入力して、キーを話したタイミングでsearchStation関数が実行されます。）
+            stationInput.addEventListener("keyup", searchStation);
+
+            async function searchStation() {
+                const inputValue = stationInput.value.trim();
+                console.log("inputValue:", inputValue);
+
+                // 既存の候補リストを削除
+                removeSuggestions();
+
+                // 入力がない場合、候補リストをクリアして処理終了
+                if (inputValue === "") return;
+                    removeSuggestions();
+
+                try {
+                    // APIから駅候補を取得
+                    const suggestions = await fetchStationSuggestions(inputValue);
+                    console.log("suggestions:", suggestions)
+                    if (suggestions == [])
+                        removeSuggestions();
+
+                    // 候補リストを表示
+                    if (suggestions.length > 0){
+                        displaySuggestions(suggestions);
+                    }
+                } catch (error) {
+                    console.error("駅の候補を取得中にエラーが発生しました:", error);
+                }
+            }
+
+            // APIリクエスト処理（Djangoから駅候補を取得）
+            async function fetchStationSuggestions(query) {
+                const response = await fetch(`{% url 'toilet:suggest_station' %}?query=${encodeURIComponent(query)}`);
+                console.log(response);
+
+                if (!response.ok) {
+                    throw new Error(`HTTPエラー: ${response.status}`);
+                }
+
+                // 非同期処理を返す（Promise）。データを取得するにはawaitを付ける必要がある。
+                const data = await response.json();
+                console.log("data.suggestions:", data.suggestions)
+                return data.suggestions || []; // suggestionsプロパティがなければ空配列を返す
+            }
+
+            // 駅候補のリストを更新する
+            function displaySuggestions(suggestions) {
+                const suggestionBox = document.createElement('ul');
+                suggestionBox.setAttribute("id", "suggestions");
+                suggestionBox.classList.add(
+                    "w-full", "max-w-md", "absolute", "bg-white", "border", 
+                    "border-gray-300", "max-h-40", "shadow-lg", "overflow-y-auto", 
+                    "z-50", "visible", "text-left", "p-1"
+                );
+
+                suggestions.forEach(station => {
+                    const li = document.createElement("li");
+                    li.textContent = `${station.station_name}(${station.train_line__railway_company})`;
+                    li.setAttribute("data-id", station.id);
+                    li.classList.add("p-2", "cursor-pointer", "hover:bg-gray-200");
+
+                    // 候補をクリックしたとき処理
+                    li.addEventListener("click", function() {
+                        stationInput.value = station.station_name;
+                        stationId.value = station.id;
+                        removeSuggestions();
+
+                        // suggestionBox.classList.remove("visible");
+                        // suggestionBox.classList.add("invisible");
+                    });
+
+                    suggestionBox.appendChild(li);
+                });
+
+                // 入力フィールドの親要素に追加
+                stationInput.parentNode.appendChild(suggestionBox);
+            }
+
+            // 既存の候補リストを削除
+            function removeSuggestions(){
+                const existingSuggestions = document.getElementById("suggestions");
+                console.log("existingSuggestions:",existingSuggestions)
+                if (existingSuggestions) {
+                    existingSuggestions.remove();
+                }
+            }
+        });
+    </script>
+{% endblock %}

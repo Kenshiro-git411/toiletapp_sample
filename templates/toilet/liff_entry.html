@@ -1,0 +1,160 @@
+{% extends 'toilet/base.html' %}
+{% load static %}
+
+{% block title %} トイレGOホーム {% endblock %}
+
+{% block content %}
+    <div class="flex flex-col justify-center items-center mt-20 space-y-6">
+        <p class="text-xl text-gray-600">
+           少々お待ちください
+        </p>
+        <div class="flex justify-center" aria-label="読み込み中">
+            <div class="animate-spin h-20 w-20 border-4 border-blue-500 rounded-full border-t-transparent"></div>
+        </div>
+    </div>
+    
+{% endblock %}
+{% block extra_js %}
+<!-- CSRFトークンを隠しフィールドとして追加 -->
+<form id="csrf-form" style="display: none;">
+    {% csrf_token %}
+</form>
+
+<script charset="utf-8" src="https://static.line-scdn.net/liff/edge/versions/2.22.3/sdk.js"></script>
+<script>
+    // クッキーを設定する関数
+    function setCookie(name, value, days) {
+        let expires = "";
+        if (days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            expires = "; expires=" + date.toUTCString();
+        }
+        document.cookie = name + "=" + (value || "") + expires + "; path=/";
+    }
+
+    // クッキーを取得する関数
+    function getCookie(name) {
+        const nameEQ = name + "=";
+        const ca = document.cookie.split(';');
+        for (let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+            if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+        }
+        return null;
+    }
+
+    // URLからリダイレクトパラメータを取得
+    function getRedirectParam() {
+        const urlParams = new URLSearchParams(window.location.search);
+        return urlParams.get('redirect');
+    }
+
+    // リダイレクト先のURLを取得
+    // ここで場合分けの編集
+    /* --------------------------------------------------*/
+    function getRedirectUrl(redirectParam) {
+        // リダイレクトパラメータに基づいてURLを返す
+        switch (redirectParam) {
+            case 'home':
+                return '{% url "toilet:home" %}';
+            case 'search_toilet':
+                return '{% url "toilet:search_toilet" %}'
+            case 'toilet_rank':
+                return '{% url "toilet:toilet_rank" %}'
+            case 'get_latest_comment':
+                return '{% url "toilet:get_latest_comment" %}'
+            default:
+                return '{% url "lp:display_lp" %}'; // デフォルトのリダイレクト先
+        }
+    }
+    /* --------------------------------------------------*/
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const isLineApp = navigator.userAgent.toLowerCase().includes('line');
+        console.log("LINEアプリからのアクセスか？", isLineApp);
+        
+        // リダイレクトパラメータを取得してクッキーに保存
+        const redirectParam = getRedirectParam();
+        if (redirectParam) {
+            setCookie('redirect_after_login', redirectParam, 1); // 1日間有効
+            console.log('リダイレクト先を保存:', redirectParam);
+        }
+
+        // LINEアプリからのアクセス時のみログイン処理を実行
+        liff.init({
+            liffId: "{{ liff_id }}"
+        })
+        .then(() => {
+            if (!liff.isLoggedIn()) {
+                liff.login();
+            } else {
+                //alert("LINEログイン済みです");
+                {% if not user.is_authenticated %}
+                liff.getProfile()
+                    .then(profile => {
+                        const csrfToken = document.querySelector('[name=csrfmiddlewaretoken]').value;
+                        fetch('{% url "accounts:liff_login" %}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRFToken': csrfToken
+                            },
+                            credentials: 'same-origin',
+                            body: JSON.stringify({
+                                line_id: profile.userId,
+                                line_name: profile.displayName
+                            })
+                        })
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                //alert("DJANGOログイン成功");
+                                // クッキーからリダイレクト先を取得
+                                const savedRedirect = getCookie('redirect_after_login');
+                                if (savedRedirect) {
+                                    // クッキーを削除
+                                    setCookie('redirect_after_login', '', -1);
+                                    // 保存されたパラメータに基づいてリダイレクト先を決定
+                                    window.location.href = getRedirectUrl(savedRedirect);
+                                } else {
+                                    // デフォルトのリダイレクト先
+                                    window.location.href = getRedirectUrl(savedRedirect);
+                                }
+                            } else {
+                                console.error('Login failed:', data.message);
+                                if (data.redirect_url) {
+                                    window.location.href = data.redirect_url;
+                                }
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Login error:', error);
+                        });
+                    })
+                    .catch(error => {
+                        console.error('Error getting profile:', error);
+                    });
+                {% else %}
+                    
+                    // 既にログイン済みの場合
+                    const savedRedirect = getCookie('redirect_after_login');
+                    if (savedRedirect) {
+                        // クッキーを削除
+                        setCookie('redirect_after_login', '', -1);
+                        // 保存されたパラメータに基づいてリダイレクト先を決定
+                        window.location.href = getRedirectUrl(savedRedirect);
+                    } else {
+                        // デフォルトのホームページへ
+                        window.location.href = '{% url "lp:display_lp" %}';
+                    }
+                {% endif %}
+            }
+        })
+        .catch(err => {
+            console.error('LIFF initialization failed', err);
+        });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>トイレGOサービス紹介</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    {% load static %}
+</head>
+<body class="bg-[#ffffff]">
+    <header class="bg-[#D9ECF9] h-20 flex relative shadow-md">
+        <div class="flex items-center justify-center w-full justify-between px-6">
+            <svg id="open_button" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-6 flex items-end">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"/>
+            </svg>
+            <!-- トイレGOという文字は必ず画面上部中央に配置する -->
+            <a href="{% url 'toilet:home' %}" class="absolute left-1/2 transform -translate-x-1/2 text-lg">トイレGO</a>
+            <div class="px-5 ">
+                <nav>
+                    <ul class="flex space-x-6 ">
+                        {% if request.user.is_authenticated %}
+                            <li class="hidden md:inline">
+                                <a href="{% url 'toilet:user_comments' %}">マイページ</a>
+                            </li>
+                            <li class="block md:hidden flex items-end">
+                                <a href="{% url 'toilet:user_comments' %}">
+                                    <img src="{% static '/accounts/account_mypage.png' %}" alt="マイページ" class="w-6 h-auto">
+                                </a>
+                            </li>
+                            <li class="hidden md:inline">
+                                <a href="{% url 'accounts:user_info_update' %}">設定</a>
+                            </li>
+                            <li class="block md:hidden flex items-end">
+                                <a href="{% url 'accounts:user_info_update' %}">
+                                    <img src="{% static '/accounts/account_setting.png' %}" alt="設定" class="w-5 h-auto">
+                                </a>
+                            </li>
+                        {% else %}
+                            <li class="hidden md:inline">
+                                <a href="{% url 'accounts:user_login' %}">ログイン</a>
+                            </li>
+                            <li class="block md:hidden flex items-end">
+                                <a href="{% url 'accounts:user_login' %}">
+                                    <img src="{% static '/accounts/account_login.png' %}" alt="ログイン" class="w-5 h-auto">
+                                </a>
+                            </li>
+                            <li class="hidden md:inline">
+                                <a href="{% url 'accounts:user_create' %}">サインアップ</a>
+                            </li>
+                            <li class="block md:hidden flex items-end">
+                                <a href="{% url 'accounts:user_create' %}"><img src="{% static '/accounts/account_create.png' %}" alt="サインアップ" class="w-6 h-auto">
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </header>
+    <div id="layer" class="bg-black/30 w-full h-full fixed top-0 left-0 z-[-1] opacity-0 invisible duration-300">
+        <div class="h-auto w-3/5 md:w-1/5 fixed left-0 top-0 shadow-lg duration-300 bg-[#D9ECF9] px-6 pt-6 pb-24">
+            <button id="close_button" class="z-[100] absolute top-4 right-4 px-3 py-1 bg-gray-800 text-white rounded">☓</button>
+            <div id="menu" class="relative w-full opacity-0 invisible">
+                <ul class="space-y-4 text-lg">
+                    <li><a href="{% url 'toilet:home' %}">ホーム</a></li>
+                    <li><a href="{% url 'toilet:search_toilet' %}">トイレを探す</a></li>
+                    <li><a href="{% url 'toilet:toilet_rank' %}">ランキング</a></li>
+                    <li><a href="{% url 'toilet:get_latest_comment' %}">最新レビュ－</a></li>
+                    {% if request.user.is_authenticated %}
+                    <li><a href="{% url 'toilet:user_comments' %}">マイページ</a></li>
+                    <li><a href="{% url 'accounts:user_info_update' %}">設定</a></li>
+                    {% else %}
+                    <li><a href="{% url 'accounts:user_login' %}">ログイン</a></li>
+                    <li><a href="{% url 'accounts:user_create' %}">サインアップ</a></li>
+                    {% endif %}
+                    <li><a href="{% url 'lp:display_lp' %}">サービス紹介ページ</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    <main class="sm:w-full mx-auto">
+        <section class="flex flex-col items-center justify-center my-36 sm:my-30">
+            <h2 class="mb-1">
+                <div class="flex items-center justify-center">
+                    <img src="{% static '/toilet/man_running.png' %}" alt="ロゴ_トイレ_人" class="w-9 sm:w-12 h-auto">
+                    <span class="font-bold text-5xl sm:text-6xl text-[#86C3EE] self-end">イレGO</span>
+                    <img src="{% static '/toilet/toilet_image.png' %}" alt="ロゴ_トイレ" class="w-10 sm:w-12 h-auto self-end">
+                </div>
+            </h2>
+            <p class="text-center text-lg text-xl text-[#5fb4e0] ">駅のトイレを探す</p>
+            <img src="{% static '/lp/hamon.png' %}" alt="波紋" class="w-4/5 sm:w-2/6 h-auto mx-auto my-6">
+        </section>
+        <section class="mb-24 sm:mb-20">
+            <div class="sm:w-4/5 mx-auto pb-5 sm:pb-12">
+                <p class="text-center sm:text-xl font-bold text-[#00365c] p-4 bg-blue-100 rounded mx-2">
+                    トイレGOは、駅のトイレを探すことができるアプリです。<br>
+                    こんなお悩みを解決するお手伝いをします。
+                </p>
+            </div>
+            <div class="flex flex-col justify-center items-center sm:flex-row space-y-6 sm:space-y-0 sm:space-x-6">
+                <div class="w-4/5 sm:w-1/4 border border-gray-100 p-3 shadow-lg">
+                    <img src="{% static '/lp/bad.png' %}" alt="体調悪い人" class="h-32 sm:w-36 object-contain mx-auto">
+                    <p class="w-full sm:text-xl font-semibold text-[#00365c] text-center">急に体調が悪くなった</p>
+                </div>
+                <div class="w-4/5 sm:w-1/4 border border-gray-100 p-3 shadow-lg">
+                    <img src="{% static '/lp/child.png' %}" alt="親子" class="h-32 sm:w-36 object-contain mx-auto">
+                    <p class="w-full sm:text-xl font-semibold text-[#00365c] text-center">子どもがトイレに行きたい</p>
+                </div>
+                <div class="w-4/5 sm:w-1/4 border border-gray-100 p-3 shadow-lg">
+                    <img src="{% static '/lp/mirror.png' %}" alt="姿見" class="h-32 sm:w-36 object-contain mx-auto">
+                    <p class="w-full sm:text-xl font-semibold text-[#00365c] text-center">身だしなみを確認したい</p>
+                </div>
+            </div>
+        </section>
+        <section class="mb-24 sm:mb-20 flex flex-col items-center justify-center">
+            <h2 class="flex justify-center items-center font-bold text-2xl mb-5 text-[#00365c]">アプリでできること</h2>
+            <div class="flex flex-col sm:flex-row justify-center items-center sm:mx-8 space-y-8 sm:space-y-0 sm:space-x-24">
+                <img src="{% static '/lp/smartphone.png' %}" alt="スマートフォン" class="w-2/5 sm:w-auto">
+                <ul class="mx-2 px-3 py-4 sm:p-10 font-semibold text-white bg-[#3697dc] rounded-lg list-disc list-outside pl-8 space-y-4">
+                    <li>駅のトイレが改札内にあるか確認できる</li>
+                    <li>チャイルドシートやおむつ交換設備付きトイレを調べることができる</li>
+                    <li>パウダールームや姿見のあるトイレを確認できる</li>
+                    <li>トイレを「きれいさ」 「広さ」 「空き具合」の観点で評価し、レビュー投稿もできる</li>
+                </ul>
+            </div>
+        </section>
+        <section class="mb-24 sm:mb-20 flex items-center justify-center">
+            <div class="flex flex-col justify-center items-center sm:w-2/3 mx-3 sm:mx-0">
+                <h2 class="text-2xl font-bold pb-3 px-6 text-[#00365c]">アプリを開発した目的</h2>
+                <img src="{% static '/lp/icon.png' %}" alt="アイコン" class="h-36">
+                <p class="w-full mt-4 py-4 px-4 bg-gray-100">
+                    駅のトイレの位置や機能のすぐに知ることで世の中の人が自分の目的にあったトイレを利用し、またトイレの混雑を解消でき、きれいなトイレを維持できると思い、トイレGOを開発しました。<br><br>
+                    最終的な目標としてはトイレだけでなく駅全体がきれいで駅利用することに不快感を感じない駅を作っていきたい。
+                </p>
+            </div>
+        </section>
+
+    </main>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const open_button = document.getElementById("open_button");
+            const layer = document.getElementById("layer");
+            const close_button = document.getElementById("close_button");
+            const menu = document.getElementById("menu");
+
+            open_button.addEventListener('click', () => {
+                open_menu();
+            })
+
+            close_button.addEventListener('click', () => {
+                close_menu();
+            })
+
+            function open_menu(){
+                layer.classList.remove('z-[-1]', 'opacity-0', 'invisible');
+                layer.classList.add('z-[999]', 'opacity-1', 'visible', 'duration-300');
+                menu.classList.remove('opacity-0', 'invisible');
+                menu.classList.add('opacity-1', 'visible', 'duration-500');
+            }
+
+            function close_menu(){
+                layer.classList.remove('z-[999]', 'opacity-1', 'visible');
+                layer.classList.add('z-[-1]', 'opacity-0', 'invisible');
+                menu.classList.remove('opacity-1', 'visible');
+                menu.classList.add('opacity-0', 'invisible');
+            }
+        })
+    </script>
+</body>
+</html>
