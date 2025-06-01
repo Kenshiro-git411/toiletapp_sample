@@ -47,7 +47,7 @@ https://toiletgo.jp/
 * Javascript 18.19.1
 * Django 5.1.6
 * PostgreSQL
-* Vulture(Ubuntu 24.04.04)
+* Vultr(Ubuntu 24.04.04)
 * Gunicorn
 * Nginx
 * LINE Front-end Framework(LIFF)
