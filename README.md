@@ -33,6 +33,14 @@ https://toiletgo.jp/
 ##### 最新のレビューを見る
 ![最新のレビューを見る](assets/readme/app_basic_5.gif)
 
+##### LINEからのアプリ操作
+・手順１
+以下のQRコードを読み込みます。<br>
+![QRコード](assets/readme/app_qr.png)<br>
+
+・手順２
+![アプリを認証する](assets/readme/login_smartphone.gif)<br>
+
 
 ## 3. 使用技術
 * Python 3.12.3
@@ -86,7 +94,7 @@ https://toiletgo.jp/
 
 ## 8. 今後の課題および導入したい機能
 * リアルタイム混雑状況確認機能
-* GPSから近くのトイレの検索機能
+* トイレまでの案内図や各駅ごとのトイレマップの導入
 * トイレの特徴ごとのタグ検索機能
 * 問い合わせフォーム
 * さらなる路線や駅のトイレを追加
