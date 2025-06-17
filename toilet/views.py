@@ -670,16 +670,20 @@ def get_toilet_rank_queryset(request, line, gender):
     else:
         raise ValueError("不正gender値が設定されました")
     
+    # is_endにはTrue or Falseが入る
     is_end = display_count >= all_obj.count()
     print("is_end:", is_end) # 最後までデータを取得出来たらtrueになる
     return {
-        "toilet_value": all_obj.order_by('value').reverse()[:display_count],
-        "toilet_size": all_obj.order_by('size').reverse()[:display_count],
-        "toilet_congestion": all_obj.order_by('congestion').reverse()[:display_count],
+        # -value:降順の意（大きい順）
+        # toilet_id__station_id__station_name_japanese:昇順の意（小さい順（あいうえお順））
+        "toilet_value": all_obj.order_by('-value', 'toilet_id__station_id__station_name_japanese', 'toilet_id')[:display_count],
+        "toilet_size": all_obj.order_by('-size', 'toilet_id__station_id__station_name_japanese', 'toilet_id')[:display_count],
+        "toilet_congestion": all_obj.order_by('-congestion', 'toilet_id__station_id__station_name_japanese', 'toilet_id')[:display_count],
         "is_end": is_end
     }
 
 def get_latest_comment(request):
+    # 最新のコメントの取得
     male_comments = MaleToiletComments.objects.filter(gender=1).order_by("data_create").reverse()
     female_comments = FemaleToiletComments.objects.filter(gender=2).order_by("data_create").reverse()
     multi_comments = MultifunctionalToiletComments.objects.filter(gender=3).order_by("data_create").reverse()

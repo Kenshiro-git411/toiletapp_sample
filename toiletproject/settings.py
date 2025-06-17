@@ -82,6 +82,15 @@ WSGI_APPLICATION = 'toiletproject.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
+# 開発環境時
+# DATABASES = {
+#         # localの場合はsqlite3を使用するように設定
+#         'default': {
+#             'ENGINE': 'django.db.backends.sqlite3',
+#             'NAME': BASE_DIR / 'db.sqlite3',
+#         }
+#     }
+
 if DEBUG:
     DATABASES = {
         # localの場合はsqlite3を使用するように設定

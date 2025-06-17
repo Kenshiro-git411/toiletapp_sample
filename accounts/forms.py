@@ -142,10 +142,20 @@ class UserInfoUpdateForm(forms.ModelForm):
             self.fields["gender"].initial = user.gender
             self.fields["is_barrier_free"].initial = user.is_barrier_free
 
-    def clean_email(self):
+    def clean_email(self, *args, **kwargs):
         """メールアドレスのバリデーション（重複しないようにする）"""
         email = self.cleaned_data["email"]
         # print("更新処理のメール", email)
+        user = self.instance
+        print("user", user)
+        user_from_db = User.objects.get(pk=user.pk)
+        print("user_from", user_from_db)
+
+        
+        # ラインIDかメールアドレス必ずどちらかが入るようにする。
+        if not user_from_db.line_id and not email:
+            raise forms.ValidationError("メールアドレスを入力してください")
+
         if User.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("このメールアドレスは既に使用されています")
         
@@ -155,6 +165,10 @@ class UserInfoUpdateForm(forms.ModelForm):
     def clean_username(self):
         """ユーザー名のバリデーション（重複しないようする）"""
         username = self.cleaned_data["username"]
+
+        if not username:
+            raise forms.ValidationError("ユーザー名を入力してください")
+
         if User.objects.filter(username=username).exclude(pk=self.instance.pk).exists():
             raise forms.ValidationError("このユーザー名は既に使用されています")
         
